@@ -14,6 +14,7 @@ function NewsletterRegistration() {
       body: JSON.stringify({ email: enteredEmail }),
       headers: {
         "Content-Type": "application/json",
+        Accept: "application/json",
       },
     })
       .then((resp) => resp.json())
@@ -32,7 +33,7 @@ function NewsletterRegistration() {
             aria-label="Your email"
             ref={emailInputRef}
           />
-          <button onClick={registrationHandler}>Register</button>
+          <button>Register</button>
         </div>
       </form>
     </section>
