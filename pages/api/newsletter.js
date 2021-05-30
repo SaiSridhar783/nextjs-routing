@@ -1,4 +1,4 @@
-import { MongoClient } from "mongodb";
+import { connectDatabase, insertDocument } from "../../helpers/db-util";
 
 async function handler(req, res) {
   if (req.method === "POST") {
@@ -9,15 +9,22 @@ async function handler(req, res) {
       return;
     }
 
-    const client = await MongoClient.connect(
-      //"mongodb+srv://sai:VY2kByaWIWw83N7i@cluster0.dipfo.mongodb.net/newsletter?retryWrites=true&w=majority"
-      "mongodb://sai:VY2kByaWIWw83N7i@cluster0-shard-00-00.dipfo.mongodb.net:27017,cluster0-shard-00-01.dipfo.mongodb.net:27017,cluster0-shard-00-02.dipfo.mongodb.net:27017/events?ssl=true&replicaSet=atlas-jzsi0n-shard-0&authSource=admin&retryWrites=true&w=majority"
-    );
-    const db = client.db();
+    let client;
 
-    await db.collection("newsletter").insertOne({ email: userEmail });
+    try {
+      client = await connectDatabase();
+    } catch (error) {
+      res.status(500).json({ message: "Database Connection Failed!" });
+      return;
+    }
 
-    client.close();
+    try {
+      await insertDocument(client, "newsletter", { email: userEmail });
+      client.close();
+    } catch (error) {
+      res.status(500).json({ message: "Insertion od Data Failed!" });
+      return;
+    }
 
     res.status(201).json({ message: "Signed up!" });
   }
